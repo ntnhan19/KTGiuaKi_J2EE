@@ -2,29 +2,303 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Books - Lab03</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <title>Danh sách sách - Lab03</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ink: #1a1a2e;
+            --paper: #f7f3ee;
+            --accent: #c8533a;
+            --gold: #d4a847;
+            --muted: #7a7068;
+            --surface: #fff;
+            --border: rgba(26,26,46,0.1);
+            --danger: #e53e3e;
+            --danger-bg: #fff5f5;
+        }
+
+        body {
+            background: var(--paper);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            background: var(--ink);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            color: #fff;
+            font-size: 1.2rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links { display: flex; gap: 0.5rem; }
+        .nav-links a {
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* MAIN */
+        main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--ink);
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--ink);
+        }
+
+        .page-title span {
+            display: block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            padding: 0.65rem 1.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-add:hover { background: #b04530; transform: translateY(-1px); }
+
+        /* TABLE */
+        .table-wrap {
+            background: var(--surface);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(26,26,46,0.07);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead th {
+            background: var(--ink);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.9rem 1.2rem;
+            text-align: left;
+        }
+
+        thead th:last-child { text-align: center; }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+            animation: rowIn 0.4s ease both;
+        }
+
+        tbody tr:nth-child(1) { animation-delay: 0.05s; }
+        tbody tr:nth-child(2) { animation-delay: 0.1s; }
+        tbody tr:nth-child(3) { animation-delay: 0.15s; }
+        tbody tr:nth-child(4) { animation-delay: 0.2s; }
+        tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+        tbody tr:hover { background: #faf8f5; }
+        tbody tr:last-child { border-bottom: none; }
+
+        td {
+            padding: 1rem 1.2rem;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        td:first-child {
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-weight: 500;
+            width: 60px;
+        }
+
+        .book-title {
+            font-weight: 500;
+            color: var(--ink);
+        }
+
+        .book-author {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        td.actions {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn-edit, .btn-del {
+            display: inline-block;
+            padding: 0.35rem 0.9rem;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .btn-edit {
+            background: #eef2ff;
+            color: #3730a3;
+            margin-right: 0.4rem;
+        }
+        .btn-edit:hover { background: #3730a3; color: #fff; }
+
+        .btn-del {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+        .btn-del:hover { background: var(--danger); color: #fff; }
+
+        /* EMPTY STATE */
+        .empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        .empty h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--ink);
+            margin-bottom: 0.5rem;
+        }
+
+        /* COUNT BADGE */
+        .count-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--ink);
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            margin-left: 0.6rem;
+            vertical-align: middle;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: 0.82rem;
+            margin-top: 2rem;
+        }
+
+        @keyframes rowIn {
+            from { opacity: 0; transform: translateX(-12px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
 </head>
 <body>
-<h1>Danh sách sách</h1>
-<p><a th:href="@{/books/add}">Thêm sách mới</a></p>
-<table>
-    <thead>
-    <tr><th>ID</th><th>Title</th><th>Author</th><th>Actions</th></tr>
-    </thead>
-    <tbody>
-    <tr th:each="b : ${books}">
-        <td th:text="${b.id}"></td>
-        <td th:text="${b.title}"></td>
-        <td th:text="${b.author}"></td>
-        <td>
-            <a th:href="@{/books/edit/{id}(id=${b.id})}">Edit</a>
-            |
-            <a th:href="@{/books/delete/{id}(id=${b.id})}" onclick="return confirm('Delete this book?');">Delete</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+
+<nav>
+    <a href="/" class="nav-brand">📚 BookManager</a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/books" class="active">Books</a>
+    </div>
+</nav>
+
+<main>
+    <div class="page-header">
+        <div class="page-title">
+            <span>Thư viện</span>
+            Danh sách sách
+            <span class="count-badge" th:text="${#lists.size(books)}">0</span>
+        </div>
+        <a th:href="@{/books/add}" class="btn-add">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Thêm sách mới
+        </a>
+    </div>
+
+    <div class="table-wrap" th:if="${!#lists.isEmpty(books)}">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên sách</th>
+                    <th>Tác giả</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="b, stat : ${books}">
+                    <td th:text="${stat.count}"></td>
+                    <td>
+                        <div class="book-title" th:text="${b.title}"></div>
+                    </td>
+                    <td>
+                        <div class="book-author" th:text="${b.author}"></div>
+                    </td>
+                    <td class="actions">
+                        <a th:href="@{/books/edit/{id}(id=${b.id})}" class="btn-edit">✏️ Edit</a>
+                        <a th:href="@{/books/delete/{id}(id=${b.id})}" class="btn-del"
+                           onclick="return confirm('Bạn chắc chắn muốn xóa sách này?')">🗑 Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="empty" th:if="${#lists.isEmpty(books)}">
+        <span class="empty-icon">📭</span>
+        <h3>Chưa có sách nào</h3>
+        <p>Hãy thêm cuốn sách đầu tiên của bạn!</p>
+    </div>
+</main>
+
+<footer>© 2025 · Phát triển ứng dụng với J2EE · Lab04</footer>
 
 </body>
 </html>

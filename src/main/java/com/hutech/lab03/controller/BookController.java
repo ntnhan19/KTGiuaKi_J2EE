@@ -2,13 +2,11 @@ package com.hutech.lab03.controller;
 
 import com.hutech.lab03.model.Book;
 import com.hutech.lab03.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/books")
@@ -33,7 +31,10 @@ public class BookController {
     }
 
     @PostMapping
-    public String add(@ModelAttribute Book book) {
+    public String add(@Valid @ModelAttribute Book book, BindingResult result) {
+        if (result.hasErrors()) {
+            return "add-book"; // Quay lại form nếu có lỗi
+        }
         bookService.save(book);
         return "redirect:/books";
     }
@@ -49,7 +50,10 @@ public class BookController {
     }
 
     @PostMapping("/update")
-    public String update(@ModelAttribute Book book) {
+    public String update(@Valid @ModelAttribute Book book, BindingResult result) {
+        if (result.hasErrors()) {
+            return "edit-book";
+        }
         bookService.save(book);
         return "redirect:/books";
     }
@@ -61,5 +65,7 @@ public class BookController {
     }
 
     @GetMapping("/")
-    public String root() { return "redirect:/books"; }
+    public String root() {
+        return "redirect:/books";
+    }
 }

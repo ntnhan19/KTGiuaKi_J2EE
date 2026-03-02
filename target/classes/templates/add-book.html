@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm sách - Lab03</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ink: #1a1a2e;
+            --paper: #f7f3ee;
+            --accent: #c8533a;
+            --gold: #d4a847;
+            --muted: #7a7068;
+            --surface: #fff;
+            --border: rgba(26,26,46,0.15);
+            --error-bg: #fff5f4;
+            --error: #c8533a;
+            --focus: #3730a3;
+        }
+
+        body {
+            background: var(--paper);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: var(--ink);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-brand {
+            font-family: 'Playfair Display', serif;
+            color: #fff;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin-left: 0.3rem;
+        }
+        .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+        main {
+            max-width: 560px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+            animation: pageIn 0.5s ease both;
+        }
+
+        .breadcrumb {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
+        .breadcrumb a { color: var(--accent); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .card {
+            background: var(--surface);
+            border-radius: 10px;
+            box-shadow: 0 4px 24px rgba(26,26,46,0.08);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--ink);
+            padding: 1.8rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '📖';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            opacity: 0.2;
+        }
+
+        .card-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: #fff;
+        }
+
+        .card-header p {
+            color: rgba(255,255,255,0.55);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        .card-body { padding: 2rem; }
+
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            color: var(--ink);
+            background: var(--paper);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--focus);
+            box-shadow: 0 0 0 3px rgba(55,48,163,0.1);
+            background: #fff;
+        }
+
+        input[type="text"].is-error {
+            border-color: var(--error);
+            background: var(--error-bg);
+        }
+
+        .error-msg {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--error);
+            font-size: 0.83rem;
+            margin-top: 0.4rem;
+            padding: 0.5rem 0.8rem;
+            background: var(--error-bg);
+            border-left: 3px solid var(--error);
+            border-radius: 0 4px 4px 0;
+            animation: slideIn 0.25s ease;
+        }
+
+        .hint {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 0.35rem;
+        }
+
+        .form-footer {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-submit {
+            flex: 1;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-submit:hover { background: #b04530; transform: translateY(-1px); }
+        .btn-submit:active { transform: translateY(0); }
+
+        .btn-cancel {
+            background: transparent;
+            color: var(--muted);
+            border: 1.5px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-cancel:hover { border-color: var(--ink); color: var(--ink); }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-brand">📚 BookManager</a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/books">Books</a>
+    </div>
+</nav>
+
+<main>
+    <div class="breadcrumb">
+        <a href="/books">← Danh sách sách</a> / Thêm mới
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h1>Thêm sách mới</h1>
+            <p>Điền đầy đủ thông tin bên dưới để thêm sách vào thư viện</p>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/books}" method="post" th:object="${book}">
+
+                <div class="form-group">
+                    <label for="title">Tên sách <span style="color:var(--accent)">*</span></label>
+                    <input type="text"
+                           id="title"
+                           th:field="*{title}"
+                           th:classappend="${#fields.hasErrors('title')} ? 'is-error' : ''"
+                           placeholder="VD: Clean Code"/>
+                    <div class="error-msg" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                        Tên sách không được để trống
+                    </div>
+                    <div class="hint" th:unless="${#fields.hasErrors('title')}">Tối đa 200 ký tự</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Tác giả <span style="color:var(--accent)">*</span></label>
+                    <input type="text"
+                           id="author"
+                           th:field="*{author}"
+                           th:classappend="${#fields.hasErrors('author')} ? 'is-error' : ''"
+                           placeholder="VD: Robert C. Martin"/>
+                    <div class="error-msg" th:if="${#fields.hasErrors('author')}" th:errors="*{author}">
+                        Tên tác giả không được để trống
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <a th:href="@{/books}" class="btn-cancel">Hủy</a>
+                    <button type="submit" class="btn-submit">+ Thêm sách</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>
