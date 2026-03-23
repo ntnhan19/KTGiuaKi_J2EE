@@ -27,11 +27,9 @@ public class EnrollmentService {
         Course course = courseRepository.findById(courseId).orElse(null);
 
         if (student != null && course != null) {
-            // Check if already enrolled
             if (enrollmentRepository.existsByStudentAndCourseId(student, courseId)) {
-                return false; // Already enrolled
+                return false;
             }
-
             Enrollment enrollment = new Enrollment();
             enrollment.setStudent(student);
             enrollment.setCourse(course);
@@ -42,8 +40,10 @@ public class EnrollmentService {
         return false;
     }
 
+    // FIX: dùng query có JOIN FETCH thay vì findByStudent
+    @Transactional(readOnly = true)
     public List<Enrollment> getEnrolledCourses(String username) {
         Student student = studentRepository.findByUsername(username).orElseThrow();
-        return enrollmentRepository.findByStudent(student);
+        return enrollmentRepository.findByStudentWithCourse(student);
     }
 }

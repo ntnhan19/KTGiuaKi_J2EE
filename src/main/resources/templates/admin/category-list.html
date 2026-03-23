@@ -38,21 +38,24 @@
                         <tr>
                             <th>#</th>
                             <th>Category Name</th>
-                            <th>Courses</th>
+                            <th>Course Count</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="category, i : ${categories}">
-                            <td style="color:var(--text-muted);font-size:0.8rem;" th:text="${i.count}">1</td>
+                        <tr th:each="item : ${categories}">
+                            <td style="color:var(--text-muted);font-size:0.8rem;" th:text="${item.id}">1</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="cat-icon"><i class="bi bi-tag-fill"></i></div>
-                                    <span style="font-weight:600;" th:text="${category.name}">Category</span>
+                                    <span style="font-weight:600;" th:text="${item.name}">Category</span>
                                 </div>
                             </td>
                             <td>
+                                <!-- FIX: dùng courseCounts map thay vì category.courses.size() -->
                                 <span class="badge-custom badge-warning">
-                                    <span th:text="${category.courses.size()}">0</span> courses
+                                    <span
+                                        th:text="${courseCounts[item.id] != null ? courseCounts[item.id] : 0}">0</span>
+                                    courses
                                 </span>
                             </td>
                         </tr>
