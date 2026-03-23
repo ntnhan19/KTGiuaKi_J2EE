@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <title>My Courses</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h2 class="mb-4 text-primary fw-bold">My Enrolled Courses</h2>
+    
+    <div class="table-responsive bg-white rounded-3 shadow-sm p-4">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Course Code/ID</th>
+                    <th>Course Name</th>
+                    <th>Lecturer</th>
+                    <th>Credits</th>
+                    <th>Enrollment Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="enrollment, j : ${enrollments}">
+                    <td th:text="${j.count}">1</td>
+                    <td th:text="${'CRS-' + enrollment.course.id}">CRS-1</td>
+                    <td class="fw-bold" th:text="${enrollment.course.name}">Software Eng</td>
+                    <td th:text="${enrollment.course.lecturer}">John Doe</td>
+                    <td th:text="${enrollment.course.credits}">3</td>
+                    <td th:text="${#temporals.format(enrollment.enrollDate, 'dd/MM/yyyy HH:mm')}">12/03/2026</td>
+                </tr>
+                <tr th:if="${enrollments.empty}">
+                    <td colspan="6" class="text-center text-muted m-3">
+                        You haven't enrolled in any courses yet. <a th:href="@{/home}">Browse courses</a>.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

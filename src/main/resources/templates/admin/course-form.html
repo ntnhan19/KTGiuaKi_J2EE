@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <title>Course Form</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 fw-bold" th:text="${course.id == null ? 'Add New Course' : 'Edit Course'}">Course Form</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{${course.id == null ? '/admin/courses/create' : '/admin/courses/edit/' + course.id}}" th:object="${course}" method="post">
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-bold">Course Name</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label fw-bold">Category</label>
+                            <select class="form-select" id="category" th:field="*{category.id}" required>
+                                <option value="" disabled selected>-- Select a Category --</option>
+                                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lecturer" class="form-label fw-bold">Lecturer</label>
+                            <input type="text" class="form-control" id="lecturer" th:field="*{lecturer}" required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('lecturer')}" th:errors="*{lecturer}"></div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="credits" class="form-label fw-bold">Credits</label>
+                                <input type="number" class="form-control" id="credits" th:field="*{credits}" min="1" required>
+                                <div class="text-danger" th:if="${#fields.hasErrors('credits')}" th:errors="*{credits}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="image" class="form-label fw-bold">Image URL</label>
+                                <input type="text" class="form-control" id="image" th:field="*{image}" placeholder="https://example.com/image.jpg">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/admin/courses}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary fw-bold" th:text="${course.id == null ? 'Save Course' : 'Update Course'}">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
