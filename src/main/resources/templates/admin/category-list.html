@@ -1,40 +1,97 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{_layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{_layout}">
+
 <head>
     <title>Manage Categories</title>
 </head>
+
 <body>
-<div layout:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold">Manage Categories</h2>
-        <a th:href="@{/admin/categories/create}" class="btn btn-primary fw-bold shadow-sm">
-            <i class="bi bi-plus-circle"></i> Add New Category
-        </a>
+    <div layout:fragment="content">
+
+        <div class="page-header">
+            <div>
+                <div class="breadcrumb-custom">
+                    <span style="font-size:0.8rem;color:var(--text-muted);font-weight:500;"><i class="bi bi-grid"></i>
+                        Admin</span>
+                    <i class="bi bi-chevron-right" style="font-size:0.7rem;color:var(--text-muted);"></i>
+                    <span style="font-size:0.8rem;color:var(--primary);font-weight:600;">Categories</span>
+                </div>
+                <h1 class="page-title mt-2">Manage <span>Categories</span></h1>
+            </div>
+            <a th:href="@{/admin/categories/create}" class="btn-primary-custom">
+                <i class="bi bi-plus-lg"></i> Add Category
+            </a>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header d-flex align-items-center justify-content-between">
+                <h6
+                    style="margin:0;font-weight:700;color:var(--text-secondary);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;">
+                    <i class="bi bi-tags me-2"></i>Category List
+                </h6>
+                <span class="badge-custom badge-primary" th:text="${categories.size() + ' categories'}">0</span>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="table-custom" th:if="${!categories.empty}">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Category Name</th>
+                            <th>Courses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="category, i : ${categories}">
+                            <td style="color:var(--text-muted);font-size:0.8rem;" th:text="${i.count}">1</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="cat-icon"><i class="bi bi-tag-fill"></i></div>
+                                    <span style="font-weight:600;" th:text="${category.name}">Category</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-custom badge-warning">
+                                    <span th:text="${category.courses.size()}">0</span> courses
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="empty-state" th:if="${categories.empty}">
+                    <div class="empty-state-icon"><i class="bi bi-tags"></i></div>
+                    <h5 style="font-weight:700;">No categories yet</h5>
+                    <p style="color:var(--text-muted);">Add a category to organize your courses.</p>
+                    <a th:href="@{/admin/categories/create}" class="btn-primary-custom mt-2">
+                        <i class="bi bi-plus-lg"></i> Add Category
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="table-responsive bg-white rounded-3 shadow-sm p-4">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Category Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="category : ${categories}">
-                    <td th:text="${category.id}">1</td>
-                    <td class="fw-bold" th:text="${category.name}">Category Name</td>
-                </tr>
-                <tr th:if="${categories.empty}">
-                    <td colspan="2" class="text-center text-muted m-3">
-                        No categories available. Start by adding one!
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    <th:block layout:fragment="head-extra">
+        <style>
+            .breadcrumb-custom {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .cat-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 8px;
+                background: rgba(245, 158, 11, 0.1);
+                color: var(--accent);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.85rem;
+            }
+        </style>
+    </th:block>
 </body>
+
 </html>

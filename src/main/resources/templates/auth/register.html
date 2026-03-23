@@ -1,39 +1,305 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{_layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{_layout}">
+
 <head>
-    <title>Register - Courses</title>
+    <title>Register</title>
 </head>
+
 <body>
-<div layout:fragment="content">
-    <div class="auth-form-container mt-5">
-        <h3 class="text-center mb-4 text-primary fw-bold">Create Account</h3>
-        
-        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">
-            Error message
+    <div layout:fragment="content">
+
+        <div class="auth-container">
+            <!-- Left panel -->
+            <div class="auth-left">
+                <div class="auth-left-content">
+                    <div class="auth-logo">
+                        <div class="brand-icon" style="width:52px;height:52px;font-size:1.4rem;border-radius:14px;">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <span class="auth-logo-text">UniCourse</span>
+                    </div>
+                    <h2 class="auth-left-title">Join thousands<br>of learners.</h2>
+                    <p class="auth-left-sub">Create your free account and start exploring courses tailored to your
+                        interests and goals.</p>
+                    <div class="auth-features">
+                        <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> Free to register — no credit
+                            card needed</div>
+                        <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> Enroll in multiple courses at
+                            once</div>
+                        <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> Track all your enrolled
+                            courses</div>
+                    </div>
+                </div>
+                <div class="auth-bg-deco">
+                    <div class="auth-deco-circle d1"></div>
+                    <div class="auth-deco-circle d2"></div>
+                </div>
+            </div>
+
+            <!-- Right form panel -->
+            <div class="auth-right">
+                <div class="auth-form-box">
+                    <h3 class="auth-form-title">Create account</h3>
+                    <p class="auth-form-sub">Fill in the details below to get started.</p>
+
+                    <div class="alert-custom alert-danger-custom" th:if="${error}">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <span th:text="${error}">Error</span>
+                    </div>
+
+                    <form th:action="@{/register}" method="post">
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="username">Username</label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-person input-icon"></i>
+                                <input type="text" class="form-control-custom form-control-icon" id="username"
+                                    name="username" placeholder="Choose a username" required autofocus>
+                            </div>
+                        </div>
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="email">Email Address</label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-envelope input-icon"></i>
+                                <input type="email" class="form-control-custom form-control-icon" id="email"
+                                    name="email" placeholder="your@email.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="password">Password</label>
+                            <div class="input-icon-wrap">
+                                <i class="bi bi-lock input-icon"></i>
+                                <input type="password" class="form-control-custom form-control-icon" id="password"
+                                    name="password" placeholder="Create a password" required>
+                            </div>
+                        </div>
+
+                        <div class="role-badge-notice">
+                            <i class="bi bi-shield-check"></i>
+                            <span>You will be registered as a <strong>Student</strong> by default.</span>
+                        </div>
+
+                        <button type="submit" class="btn-primary-custom w-100 justify-content-center mt-3"
+                            style="padding:12px;">
+                            <i class="bi bi-person-plus"></i> Create Account
+                        </button>
+                    </form>
+
+                    <p class="auth-switch-text mt-4">
+                        Already have an account? <a th:href="@{/login}" class="auth-link">Sign in here</a>
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <form th:action="@{/register}" method="post">
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-4">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 fw-bold">Register as Student</button>
-        </form>
-
-        <div class="text-center mt-3">
-            <small>Already have an account? <a th:href="@{/login}" class="text-decoration-none">Login</a></small>
-        </div>
     </div>
-</div>
+
+    <th:block layout:fragment="head-extra">
+        <style>
+            .auth-container {
+                display: flex;
+                min-height: calc(100vh - 200px);
+                border-radius: 24px;
+                overflow: hidden;
+                box-shadow: 0 24px 60px rgba(79, 70, 229, 0.15);
+                margin: -8px 0;
+                border: 1px solid rgba(79, 70, 229, 0.15);
+            }
+
+            .auth-left {
+                background: linear-gradient(135deg, #064e3b 0%, #065f46 60%, #10b981 100%);
+                flex: 1;
+                padding: 48px;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                min-width: 340px;
+            }
+
+            .auth-left-content {
+                position: relative;
+                z-index: 2;
+            }
+
+            .auth-logo {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 40px;
+            }
+
+            .auth-logo-text {
+                font-family: 'DM Serif Display', serif;
+                font-size: 1.4rem;
+                color: white;
+            }
+
+            .auth-left-title {
+                font-family: 'DM Serif Display', serif;
+                font-size: 2.2rem;
+                color: white;
+                line-height: 1.2;
+                margin-bottom: 16px;
+            }
+
+            .auth-left-sub {
+                color: rgba(255, 255, 255, 0.65);
+                font-size: 0.95rem;
+                line-height: 1.6;
+                margin-bottom: 32px;
+            }
+
+            .auth-features {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .auth-feature {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 0.875rem;
+            }
+
+            .auth-feature i {
+                color: #a7f3d0;
+                font-size: 1rem;
+            }
+
+            .auth-bg-deco {
+                position: absolute;
+                inset: 0;
+                z-index: 1;
+            }
+
+            .auth-deco-circle {
+                position: absolute;
+                border-radius: 50%;
+            }
+
+            .d1 {
+                width: 300px;
+                height: 300px;
+                background: rgba(255, 255, 255, 0.05);
+                bottom: -100px;
+                right: -100px;
+            }
+
+            .d2 {
+                width: 150px;
+                height: 150px;
+                background: rgba(167, 243, 208, 0.08);
+                top: 60px;
+                right: 40px;
+            }
+
+            .auth-right {
+                background: white;
+                width: 420px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 48px 40px;
+            }
+
+            .auth-form-box {
+                width: 100%;
+            }
+
+            .auth-form-title {
+                font-family: 'DM Serif Display', serif;
+                font-size: 1.8rem;
+                color: var(--text-primary);
+                margin-bottom: 6px;
+            }
+
+            .auth-form-sub {
+                color: var(--text-muted);
+                font-size: 0.9rem;
+                margin-bottom: 28px;
+            }
+
+            .form-group-custom {
+                margin-bottom: 16px;
+            }
+
+            .input-icon-wrap {
+                position: relative;
+            }
+
+            .input-icon {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 0.95rem;
+                pointer-events: none;
+            }
+
+            .form-control-icon {
+                padding-left: 38px !important;
+            }
+
+            .w-100 {
+                width: 100% !important;
+            }
+
+            .role-badge-notice {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: rgba(16, 185, 129, 0.08);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+                border-radius: 10px;
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                color: #065f46;
+                margin-top: 4px;
+            }
+
+            .role-badge-notice i {
+                color: var(--accent2);
+                font-size: 1rem;
+            }
+
+            .auth-switch-text {
+                text-align: center;
+                font-size: 0.875rem;
+                color: var(--text-muted);
+            }
+
+            .auth-link {
+                color: var(--primary);
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+            .auth-link:hover {
+                text-decoration: underline;
+            }
+
+            @media (max-width: 768px) {
+                .auth-container {
+                    flex-direction: column;
+                }
+
+                .auth-left {
+                    min-width: unset;
+                    padding: 32px 24px;
+                }
+
+                .auth-right {
+                    width: 100%;
+                    padding: 32px 24px;
+                }
+            }
+        </style>
+    </th:block>
 </body>
+
 </html>

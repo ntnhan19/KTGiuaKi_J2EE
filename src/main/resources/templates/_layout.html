@@ -1,91 +1,621 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Registration System</title>
-    <!-- Bootstrap 5 -->
+    <title layout:title-pattern="$CONTENT_TITLE | UniCourse">UniCourse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .course-card { transition: transform 0.2s, box-shadow 0.2s; border: none; border-radius: 12px; overflow: hidden; }
-        .course-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .course-image { height: 200px; object-fit: cover; }
-        .navbar-brand { font-weight: bold; }
-        .auth-form-container { max-width: 400px; margin: auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #818cf8;
+            --accent: #f59e0b;
+            --accent2: #10b981;
+            --surface: #ffffff;
+            --surface2: #f8fafc;
+            --surface3: #f1f5f9;
+            --border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 20px 40px rgba(79, 70, 229, 0.12), 0 8px 16px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--surface2);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 20px rgba(79, 70, 229, 0.08);
+        }
+
+        .navbar-brand-custom {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .nav-link-custom {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 14px !important;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link-custom:hover {
+            color: var(--primary) !important;
+            background: rgba(79, 70, 229, 0.08);
+        }
+
+        .nav-link-custom.active {
+            color: var(--primary) !important;
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        .search-input {
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 0.875rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--surface3);
+            transition: all 0.2s;
+            outline: none;
+            width: 220px;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-light);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        .search-btn {
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-nav-login {
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            border-radius: 10px;
+            padding: 7px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-nav-login:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-nav-register {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white !important;
+            border-radius: 10px;
+            padding: 7px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .btn-nav-register:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface3);
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            border: 1.5px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* ===== PAGE WRAPPER ===== */
+        .page-wrapper {
+            padding: 32px 0 64px;
+        }
+
+        /* ===== CARDS ===== */
+        .card-custom {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-custom:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(79, 70, 229, 0.2);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: var(--surface3);
+            color: var(--text-secondary);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary-custom:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        /* ===== TABLE ===== */
+        .table-custom {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        .table-custom th {
+            background: var(--surface3);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-custom td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--surface3);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        .table-custom tbody tr:hover {
+            background: rgba(79, 70, 229, 0.02);
+        }
+
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== BADGES ===== */
+        .badge-custom {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent2);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent);
+        }
+
+        /* ===== FORM ===== */
+        .form-label-custom {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        }
+
+        .form-error {
+            font-size: 0.8rem;
+            color: var(--danger);
+            margin-top: 4px;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .page-title span {
+            color: var(--primary);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-custom {
+            background: var(--text-primary);
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            padding: 24px 0;
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        .footer-custom strong {
+            color: white;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .btn-icon:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .btn-icon.danger:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* ===== ALERT ===== */
+        .alert-custom {
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success-custom {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+        }
+
+        .alert-danger-custom {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+        }
+
+        /* ===== COURSE IMAGE THUMB ===== */
+        .course-thumb {
+            width: 54px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: var(--surface3);
+        }
+
+        .course-thumb-placeholder {
+            width: 54px;
+            height: 38px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-light);
+            font-size: 1rem;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 16px;
+            color: var(--primary-light);
+        }
+
+        /* ===== PANEL ===== */
+        .panel {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--surface3);
+            background: var(--surface2);
+        }
+
+        .panel-body {
+            padding: 24px;
+        }
+
+        .panel-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--surface3);
+            background: var(--surface2);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        /* Responsive tweak */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .search-input {
+                width: 160px;
+            }
+        }
     </style>
+    <th:block layout:fragment="head-extra"></th:block>
 </head>
+
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top mb-4 shadow-sm">
-    <div class="container">
-        <a class="navbar-brand shadow-sm d-flex align-items-center" th:href="@{/home}">
-            <i class="bi bi-book-half me-2"></i> UNI Courses
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/home}">Home</a>
-                </li>
-                <!-- For Admin -->
-                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                    <a class="nav-link" th:href="@{/admin/courses}">Manage Courses</a>
-                </li>
-                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                    <a class="nav-link" th:href="@{/admin/categories}">Manage Categories</a>
-                </li>
-                <!-- For Student -->
-                <li class="nav-item" sec:authorize="hasRole('STUDENT')">
-                    <a class="nav-link" th:href="@{/my-courses}">My Courses</a>
-                </li>
-            </ul>
+    <!-- NAVBAR -->
+    <nav class="navbar-custom">
+        <div class="container d-flex align-items-center gap-3 flex-wrap">
+            <!-- Brand -->
+            <a class="navbar-brand-custom me-2" th:href="@{/home}">
+                <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+                UniCourse
+            </a>
 
-            <!-- Search Bar -->
-            <form class="d-flex mx-auto" th:action="@{/home}" method="get" style="max-width: 300px; width: 100%;">
-                <div class="input-group">
-                    <input class="form-control" type="search" name="keyword" th:value="${keyword}" placeholder="Search course name..." aria-label="Search">
-                    <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
-                </div>
+            <!-- Nav Links -->
+            <div class="d-flex align-items-center gap-1 me-auto flex-wrap">
+                <a class="nav-link-custom" th:href="@{/home}"><i class="bi bi-house-door"></i> Home</a>
+                <span sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link-custom" th:href="@{/admin/courses}"><i class="bi bi-grid-3x3-gap"></i>
+                        Courses</a>
+                    <a class="nav-link-custom" th:href="@{/admin/categories}"><i class="bi bi-tags"></i> Categories</a>
+                </span>
+                <a class="nav-link-custom" th:href="@{/my-courses}" sec:authorize="hasRole('STUDENT')">
+                    <i class="bi bi-bookmark-check"></i> My Courses
+                </a>
+            </div>
+
+            <!-- Search -->
+            <form th:action="@{/home}" method="get" class="d-flex align-items-center gap-2">
+                <input class="search-input" type="search" name="keyword" th:value="${keyword}"
+                    placeholder="Search courses...">
+                <button class="search-btn" type="submit"><i class="bi bi-search"></i></button>
             </form>
 
-            <ul class="navbar-nav ms-auto ps-3 mt-2 mt-lg-0">
-                <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a class="btn btn-outline-light me-2" th:href="@{/login}">Login</a>
-                </li>
-                <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a class="btn btn-light" th:href="@{/register}">Register</a>
-                </li>
-                <li class="nav-item align-self-center text-light me-3" sec:authorize="isAuthenticated()">
-                    <i class="bi bi-person-circle"></i> <span sec:authentication="name"></span>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Logout</button>
+            <!-- User actions -->
+            <div class="d-flex align-items-center gap-2 ms-2">
+                <div sec:authorize="!isAuthenticated()" class="d-flex gap-2">
+                    <a th:href="@{/login}" class="btn-nav-login">Login</a>
+                    <a th:href="@{/register}" class="btn-nav-register">Register</a>
+                </div>
+                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                    <div class="user-badge">
+                        <div class="user-avatar"><i class="bi bi-person-fill"></i></div>
+                        <span sec:authentication="name">User</span>
+                    </div>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</button>
                     </form>
-                </li>
-            </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="page-wrapper">
+        <div class="container" layout:fragment="content">
+            <!-- Content injected here -->
         </div>
     </div>
-</nav>
 
-<div class="container" layout:fragment="content">
-    <!-- Page Content will go here -->
-</div>
+    <!-- FOOTER -->
+    <footer class="footer-custom">
+        <div class="container">
+            <strong>UniCourse</strong> &nbsp;·&nbsp; Mid-Term J2EE &copy; 2025 &nbsp;·&nbsp; Nguyen Tran Ngoc Han
+        </div>
+    </footer>
 
-<!-- Footer -->
-<footer class="bg-dark text-white text-center py-4 mt-5">
-    <div class="container">
-        <p class="mb-0">&copy; 2025 Mid-Term J2EE - Course Registration. Student: Nguyen Tran Ngoc Han.</p>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <th:block layout:fragment="scripts"></th:block>
 </body>
+
 </html>

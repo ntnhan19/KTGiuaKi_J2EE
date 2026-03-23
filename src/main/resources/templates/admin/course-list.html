@@ -1,55 +1,186 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{_layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{_layout}">
+
 <head>
     <title>Manage Courses</title>
 </head>
+
 <body>
-<div layout:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold">Manage Courses</h2>
-        <a th:href="@{/admin/courses/create}" class="btn btn-primary fw-bold shadow-sm">
-            <i class="bi bi-plus-circle"></i> Add New Course
-        </a>
+    <div layout:fragment="content">
+
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <div class="breadcrumb-custom">
+                    <span class="breadcrumb-item-custom"><i class="bi bi-grid"></i> Admin</span>
+                    <i class="bi bi-chevron-right breadcrumb-sep"></i>
+                    <span class="breadcrumb-item-custom active">Courses</span>
+                </div>
+                <h1 class="page-title mt-2">Manage <span>Courses</span></h1>
+            </div>
+            <a th:href="@{/admin/courses/create}" class="btn-primary-custom">
+                <i class="bi bi-plus-lg"></i> Add New Course
+            </a>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row mb-4">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(79,70,229,0.1); color: var(--primary);"><i
+                        class="bi bi-journal-richtext"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${courses.size()}">0</div>
+                    <div class="stat-label">Total Courses</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Panel -->
+        <div class="panel">
+            <div class="panel-header d-flex align-items-center justify-content-between">
+                <h6
+                    style="margin:0;font-weight:700;color:var(--text-secondary);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;">
+                    <i class="bi bi-list-ul me-2"></i>Course List
+                </h6>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="table-custom" th:if="${!courses.empty}">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Preview</th>
+                            <th>Course Name</th>
+                            <th>Category</th>
+                            <th>Lecturer</th>
+                            <th>Credits</th>
+                            <th style="text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="course, i : ${courses}">
+                            <td style="color:var(--text-muted);font-size:0.8rem;" th:text="${i.count}">1</td>
+                            <td>
+                                <img th:if="${course.image != null and !course.image.isEmpty()}"
+                                    th:src="${course.image}" class="course-thumb" alt="img"
+                                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                <div class="course-thumb-placeholder"
+                                    th:if="${course.image == null or course.image.isEmpty()}">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight:600;color:var(--text-primary);" th:text="${course.name}">Name
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-custom badge-primary"
+                                    th:text="${course.category?.name ?: '—'}">Cat</span>
+                            </td>
+                            <td style="color:var(--text-secondary);" th:text="${course.lecturer}">Lecturer</td>
+                            <td>
+                                <span class="badge-custom badge-success">
+                                    <i class="bi bi-award"></i>
+                                    <span th:text="${course.credits}">3</span>
+                                </span>
+                            </td>
+                            <td style="text-align:center;">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn-icon"
+                                        title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a th:href="@{/admin/courses/delete/{id}(id=${course.id})}" class="btn-icon danger"
+                                        title="Delete"
+                                        onclick="return confirm('Are you sure you want to delete this course?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Empty State -->
+                <div class="empty-state" th:if="${courses.empty}">
+                    <div class="empty-state-icon"><i class="bi bi-journal-x"></i></div>
+                    <h5 style="font-weight:700;">No courses yet</h5>
+                    <p style="color:var(--text-muted);">Start by adding your first course.</p>
+                    <a th:href="@{/admin/courses/create}" class="btn-primary-custom mt-2">
+                        <i class="bi bi-plus-lg"></i> Add Course
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="table-responsive bg-white rounded-3 shadow-sm p-4">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Image</th>
-                    <th>Course Name</th>
-                    <th>Category</th>
-                    <th>Lecturer</th>
-                    <th>Credits</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="course : ${courses}">
-                    <td th:text="${course.id}">1</td>
-                    <td>
-                        <img th:if="${!#strings.isEmpty(course.image)}" th:src="${course.image}" class="img-thumbnail" style="width: 60px; height: 40px; object-fit: cover;" alt="Course Image">
-                    </td>
-                    <td class="fw-bold" th:text="${course.name}">Course Name</td>
-                    <td th:text="${course.category?.name}">Category</td>
-                    <td th:text="${course.lecturer}">Lecturer</td>
-                    <td th:text="${course.credits}">3</td>
-                    <td class="text-center">
-                        <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                        <a th:href="@{/admin/courses/delete/{id}(id=${course.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this course?')"><i class="bi bi-trash"></i></a>
-                    </td>
-                </tr>
-                <tr th:if="${courses.empty}">
-                    <td colspan="7" class="text-center text-muted m-3">
-                        No courses available. Start by adding one!
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    <th:block layout:fragment="head-extra">
+        <style>
+            .breadcrumb-custom {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .breadcrumb-item-custom {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                font-weight: 500;
+            }
+
+            .breadcrumb-item-custom.active {
+                color: var(--primary);
+            }
+
+            .breadcrumb-sep {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+            }
+
+            .stats-row {
+                display: flex;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .stat-card {
+                background: white;
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 16px 20px;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                min-width: 160px;
+                box-shadow: var(--shadow-sm);
+            }
+
+            .stat-icon {
+                width: 42px;
+                height: 42px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: var(--text-primary);
+                line-height: 1;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                margin-top: 2px;
+                font-weight: 500;
+            }
+        </style>
+    </th:block>
 </body>
+
 </html>

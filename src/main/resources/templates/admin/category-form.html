@@ -1,36 +1,78 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{_layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{_layout}">
+
 <head>
     <title>Category Form</title>
 </head>
+
 <body>
-<div layout:fragment="content">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 rounded-3">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0 fw-bold">Add New Category</h4>
+    <div layout:fragment="content">
+
+        <div class="page-header">
+            <div>
+                <div class="breadcrumb-custom">
+                    <a th:href="@{/admin/categories}"
+                        style="text-decoration:none;color:var(--text-muted);font-size:0.8rem;font-weight:500;">
+                        <i class="bi bi-tags"></i> Categories
+                    </a>
+                    <i class="bi bi-chevron-right" style="font-size:0.7rem;color:var(--text-muted);"></i>
+                    <span style="font-size:0.8rem;color:var(--primary);font-weight:600;">New Category</span>
                 </div>
-                <div class="card-body p-4">
+                <h1 class="page-title mt-2">Add New <span>Category</span></h1>
+            </div>
+            <a th:href="@{/admin/categories}" class="btn-secondary-custom">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <div style="max-width:520px;">
+            <div class="panel">
+                <div class="panel-header">
+                    <h6
+                        style="margin:0;font-weight:700;color:var(--text-secondary);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.05em;">
+                        <i class="bi bi-tag me-2"></i>Category Details
+                    </h6>
+                </div>
+                <div class="panel-body">
                     <form th:action="@{/admin/categories/create}" th:object="${category}" method="post">
-                        
-                        <div class="mb-3">
-                            <label for="name" class="form-label fw-bold">Category Name</label>
-                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        <div class="form-group-custom">
+                            <label class="form-label-custom" for="name">
+                                Category Name <span style="color:var(--danger);">*</span>
+                            </label>
+                            <input type="text" class="form-control-custom" id="name" th:field="*{name}"
+                                placeholder="e.g. Computer Science" autofocus>
+                            <div class="form-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <a th:href="@{/admin/categories}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary fw-bold">Save Category</button>
+                        <div class="d-flex gap-3 mt-4">
+                            <a th:href="@{/admin/categories}" class="btn-secondary-custom">
+                                <i class="bi bi-x"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn-primary-custom">
+                                <i class="bi bi-plus-lg"></i> Save Category
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
     </div>
-</div>
+
+    <th:block layout:fragment="head-extra">
+        <style>
+            .breadcrumb-custom {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .form-group-custom {
+                margin-bottom: 16px;
+            }
+        </style>
+    </th:block>
 </body>
+
 </html>

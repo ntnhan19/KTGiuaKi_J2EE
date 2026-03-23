@@ -1,80 +1,416 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      layout:decorate="~{_layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{_layout}">
+
 <head>
-    <title>Home - Courses</title>
+    <title>Home</title>
 </head>
+
 <body>
-<div layout:fragment="content">
+    <div layout:fragment="content">
 
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h1 class="fw-bold text-primary">Explore Our Courses</h1>
-            <p class="text-muted">Find the best courses and enroll to upgrade your skills.</p>
+        <!-- Hero Banner -->
+        <div class="hero-section mb-5">
+            <div class="hero-content">
+                <div class="hero-tag">🎓 Course Registration System</div>
+                <h1 class="hero-title">Explore &amp; Enroll in<br><span>Top Courses</span></h1>
+                <p class="hero-subtitle">Discover hundreds of courses, taught by expert lecturers.<br>Start learning
+                    today — anytime, anywhere.</p>
+            </div>
+            <div class="hero-decoration">
+                <div class="deco-circle c1"></div>
+                <div class="deco-circle c2"></div>
+                <div class="deco-circle c3"></div>
+            </div>
         </div>
-    </div>
 
-    <!-- Alerts -->
-    <div th:if="${param.enrollSuccess}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Success!</strong> Enrolled carefully!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <div th:if="${param.enrollError}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Error!</strong> Could not enroll. You might already be enrolled.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+        <!-- Alerts -->
+        <div th:if="${param.enrollSuccess}" class="alert-custom alert-success-custom mb-4">
+            <i class="bi bi-check-circle-fill"></i>
+            <span><strong>Enrolled successfully!</strong> The course has been added to your list.</span>
+            <button onclick="this.parentElement.remove()"
+                style="margin-left:auto;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">×</button>
+        </div>
+        <div th:if="${param.enrollError}" class="alert-custom alert-danger-custom mb-4">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span><strong>Enrollment failed.</strong> You may already be enrolled in this course.</span>
+            <button onclick="this.parentElement.remove()"
+                style="margin-left:auto;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">×</button>
+        </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        <!-- Loop over courses -->
-        <div class="col" th:each="course : ${courses}">
-            <div class="card h-100 course-card shadow-sm">
-                <img th:if="${!#strings.isEmpty(course.image)}" th:src="${course.image}" class="card-img-top course-image" alt="Course Image" onerror="this.src='https://via.placeholder.com/800x400?text=No+Image'">
-                <img th:unless="${!#strings.isEmpty(course.image)}" src="https://via.placeholder.com/800x400?text=Course" class="card-img-top course-image" alt="Placeholder">
-                
-                <div class="card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="badge bg-secondary" th:text="${course.category?.name}">Category</span>
-                        <span class="badge bg-info text-dark"><i class="bi bi-star-fill text-warning"></i> <span th:text="${course.credits}">3</span> Credits</span>
+        <!-- Section Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="section-title" th:if="${keyword == null or keyword.isEmpty()}">All Courses</h2>
+                <h2 class="section-title" th:unless="${keyword == null or keyword.isEmpty()}">
+                    Results for "<span class="text-primary" th:text="${keyword}"></span>"
+                </h2>
+                <p class="text-muted small mt-1" th:if="${totalPages > 0}">
+                    Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span>
+                </p>
+            </div>
+            <a th:href="@{/home}" th:if="${keyword != null and !keyword.isEmpty()}" class="btn-secondary-custom btn-sm"
+                style="padding:6px 14px;font-size:0.8rem;">
+                <i class="bi bi-x"></i> Clear
+            </a>
+        </div>
+
+        <!-- Course Grid -->
+        <div class="course-grid" th:if="${courses.size() > 0}">
+            <div class="course-card-wrap" th:each="course : ${courses}">
+                <div class="course-card-v2">
+                    <!-- Image -->
+                    <div class="course-card-img-wrap">
+                        <img th:if="${course.image != null and !course.image.isEmpty()}" th:src="${course.image}"
+                            alt="Course" class="course-card-img"
+                            onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80'">
+                        <div class="course-card-img-placeholder"
+                            th:unless="${course.image != null and !course.image.isEmpty()}">
+                            <i class="bi bi-journal-code"></i>
+                        </div>
+                        <div class="course-card-category" th:text="${course.category?.name ?: 'General'}">Category</div>
                     </div>
-                    <h5 class="card-title fw-bold" th:text="${course.name}">Course Name</h5>
-                    <p class="card-text text-muted small mb-3"><i class="bi bi-person-video3"></i> Lecturer: <strong th:text="${course.lecturer}">John Doe</strong></p>
-                    
-                    <div class="mt-auto">
-                        <form th:action="@{/enroll/{id}(id=${course.id})}" method="post" sec:authorize="hasRole('STUDENT')">
-                            <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
-                                <i class="bi bi-bookmark-plus"></i> Enroll Now
-                            </button>
-                        </form>
-                        <div sec:authorize="isAnonymous()">
-                            <a th:href="@{/login}" class="btn btn-outline-primary w-100">Login to Enroll</a>
+
+                    <!-- Body -->
+                    <div class="course-card-body">
+                        <h5 class="course-card-title" th:text="${course.name}">Course Name</h5>
+                        <div class="course-card-meta">
+                            <span class="meta-item"><i class="bi bi-person-video3"></i> <span
+                                    th:text="${course.lecturer}">Lecturer</span></span>
+                            <span class="meta-item credits"><i class="bi bi-patch-check-fill"></i> <span
+                                    th:text="${course.credits}">3</span> credits</span>
+                        </div>
+                        <div class="course-card-footer">
+                            <form th:action="@{/enroll/{id}(id=${course.id})}" method="post"
+                                sec:authorize="hasRole('STUDENT')" class="w-100">
+                                <button type="submit" class="btn-enroll">
+                                    <i class="bi bi-bookmark-plus"></i> Enroll Now
+                                </button>
+                            </form>
+                            <div sec:authorize="isAnonymous()" class="w-100">
+                                <a th:href="@{/login}" class="btn-enroll-outline">
+                                    <i class="bi bi-lock"></i> Login to Enroll
+                                </a>
+                            </div>
+                            <div sec:authorize="hasRole('ADMIN')" class="w-100">
+                                <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn-enroll-outline">
+                                    <i class="bi bi-pencil"></i> Edit Course
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <div th:if="${courses.size() == 0}" class="text-center my-5">
-        <h4 class="text-muted">No courses found <i class="bi bi-emoji-frown"></i></h4>
+
+        <!-- Empty State -->
+        <div class="empty-state" th:if="${courses.size() == 0}">
+            <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+            <h4 style="font-weight:700;color:var(--text-primary);">No courses found</h4>
+            <p style="color:var(--text-muted);">Try a different search term or browse all courses.</p>
+            <a th:href="@{/home}" class="btn-primary-custom mt-2">Browse All Courses</a>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="pagination-wrap mt-5" th:if="${totalPages > 1}">
+            <a class="page-btn" th:href="@{/home(page=${currentPage - 1}, keyword=${keyword})}"
+                th:classappend="${currentPage == 0} ? 'disabled'">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <a class="page-btn" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:href="@{/home(page=${i}, keyword=${keyword})}" th:text="${i + 1}"
+                th:classappend="${currentPage == i} ? 'active'">1</a>
+            <a class="page-btn" th:href="@{/home(page=${currentPage + 1}, keyword=${keyword})}"
+                th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </nav>
+
     </div>
 
-    <!-- Pagination -->
-    <nav aria-label="Page navigation" class="mt-5" th:if="${totalPages > 0}">
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/home(page=${currentPage - 1}, keyword=${keyword})}">Previous</a>
-            </li>
-            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == i} ? 'active'">
-                <a class="page-link" th:href="@{/home(page=${i}, keyword=${keyword})}" th:text="${i + 1}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/home(page=${currentPage + 1}, keyword=${keyword})}">Next</a>
-            </li>
-        </ul>
-    </nav>
+    <th:block layout:fragment="head-extra">
+        <style>
+            /* ===== HERO ===== */
+            .hero-section {
+                background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+                border-radius: 24px;
+                padding: 56px 48px;
+                position: relative;
+                overflow: hidden;
+                color: white;
+            }
 
-</div>
+            .hero-tag {
+                display: inline-block;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 6px 16px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .hero-title {
+                font-family: 'DM Serif Display', serif;
+                font-size: clamp(2rem, 4vw, 3rem);
+                line-height: 1.15;
+                margin-bottom: 16px;
+            }
+
+            .hero-title span {
+                background: linear-gradient(90deg, #a5f3fc, #818cf8);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .hero-subtitle {
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 1rem;
+                line-height: 1.6;
+                max-width: 480px;
+            }
+
+            .deco-circle {
+                position: absolute;
+                border-radius: 50%;
+                opacity: 0.15;
+            }
+
+            .c1 {
+                width: 280px;
+                height: 280px;
+                background: white;
+                top: -80px;
+                right: -60px;
+            }
+
+            .c2 {
+                width: 160px;
+                height: 160px;
+                background: #818cf8;
+                bottom: -40px;
+                right: 160px;
+            }
+
+            .c3 {
+                width: 80px;
+                height: 80px;
+                background: #a5f3fc;
+                top: 40px;
+                right: 200px;
+            }
+
+            /* ===== SECTION TITLE ===== */
+            .section-title {
+                font-family: 'DM Serif Display', serif;
+                font-size: 1.5rem;
+                margin: 0;
+                color: var(--text-primary);
+            }
+
+            /* ===== COURSE GRID ===== */
+            .course-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 24px;
+            }
+
+            .course-card-v2 {
+                background: white;
+                border-radius: 16px;
+                border: 1px solid var(--border);
+                overflow: hidden;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .course-card-v2:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 20px 40px rgba(79, 70, 229, 0.15);
+                border-color: rgba(79, 70, 229, 0.3);
+            }
+
+            .course-card-img-wrap {
+                position: relative;
+                height: 180px;
+                overflow: hidden;
+            }
+
+            .course-card-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.4s ease;
+            }
+
+            .course-card-v2:hover .course-card-img {
+                transform: scale(1.05);
+            }
+
+            .course-card-img-placeholder {
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--primary-light);
+                font-size: 2.5rem;
+            }
+
+            .course-card-category {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                background: rgba(255, 255, 255, 0.92);
+                backdrop-filter: blur(8px);
+                border-radius: 6px;
+                padding: 3px 10px;
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--primary);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .course-card-body {
+                padding: 18px;
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+            }
+
+            .course-card-title {
+                font-size: 1rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 10px;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .course-card-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+
+            .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 0.82rem;
+                color: var(--text-secondary);
+            }
+
+            .meta-item.credits {
+                color: var(--accent2);
+                font-weight: 600;
+            }
+
+            .course-card-footer {
+                margin-top: auto;
+            }
+
+            .btn-enroll {
+                width: 100%;
+                background: linear-gradient(135deg, var(--primary), #6366f1);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                padding: 10px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            }
+
+            .btn-enroll:hover {
+                opacity: 0.9;
+                transform: translateY(-1px);
+                box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+            }
+
+            .btn-enroll-outline {
+                width: 100%;
+                background: transparent;
+                color: var(--primary);
+                border: 1.5px solid rgba(79, 70, 229, 0.3);
+                border-radius: 10px;
+                padding: 9px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                text-decoration: none;
+            }
+
+            .btn-enroll-outline:hover {
+                background: rgba(79, 70, 229, 0.05);
+                border-color: var(--primary);
+            }
+
+            /* ===== PAGINATION ===== */
+            .pagination-wrap {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .page-btn {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                border: 1.5px solid var(--border);
+                background: white;
+                color: var(--text-secondary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.875rem;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.2s;
+                cursor: pointer;
+            }
+
+            .page-btn:hover:not(.disabled):not(.active) {
+                border-color: var(--primary);
+                color: var(--primary);
+                background: rgba(79, 70, 229, 0.05);
+            }
+
+            .page-btn.active {
+                background: var(--primary);
+                border-color: var(--primary);
+                color: white;
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            }
+
+            .page-btn.disabled {
+                opacity: 0.4;
+                pointer-events: none;
+            }
+        </style>
+    </th:block>
 </body>
+
 </html>
